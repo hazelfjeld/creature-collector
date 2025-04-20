@@ -1,6 +1,6 @@
 import pygame
 pygame.init()
-
+import random
 WIDTH=600
 HEIGHT=600
 screen=pygame.display.set_mode((WIDTH,HEIGHT))
@@ -9,6 +9,43 @@ font = pygame.font.Font(None, 20)
 # Colors
 WHITE=(255,255,255)
 BLACK=(0,0,0)
+
+# === Creatures ===
+summoned_creature = None
+
+class Creature:
+    def __init__(self,attack,defense,health,rarity,color):
+        self.attack=attack
+        self.defense=defense
+        self.health=health
+        self.rarity=rarity
+        self.color=color
+
+common = Creature(attack=5, defense=5, health=5, rarity=60, color=(211, 211, 211))
+uncommon = Creature(attack=8, defense=8, health=8, rarity=20, color=(70, 130, 180))
+rare = Creature(attack=10, defense=10, health=10, rarity=14, color=(60, 179, 113))
+epic = Creature(attack=12, defense=12, health=12, rarity=5, color=(147, 112, 219))
+legendary = Creature(attack=15, defense=15, health=15, rarity=1, color=(255, 215, 0))
+
+# Define position and radius for the summoned creature
+circle_pos = (275, 275)
+circle_radius = 25
+
+def summon_creature():
+    roll = random.randint(1, 100)
+
+    if roll <= legendary.rarity:
+        return legendary
+    elif roll <= legendary.rarity + epic.rarity:
+        return epic
+    elif roll <= legendary.rarity + epic.rarity + rare.rarity:
+        return rare
+    elif roll <= legendary.rarity + epic.rarity + rare.rarity + uncommon.rarity:
+        return uncommon
+    else:
+        return common
+
+
 # UI config
 UI="Overworld" # We can edit this and make it something like "Start" for the start screen
 # === Player Vars ===
@@ -35,7 +72,7 @@ while running:
                 if load_button.collidepoint(events.pos):
                     UI = "Overworld"
                 if new_game_button.collidepoint(events.pos):
-                    UI = "Overworld"
+                    summoned_creature = summon_creature()
             
             pass
         if UI == "Overworld":
@@ -52,6 +89,8 @@ while running:
         screen.blit(load_button_text, load_button)
         pygame.draw.rect(screen, BLACK, new_game_button) # Exit button
         screen.blit(new_game_text, new_game_button)
+        if summoned_creature:
+            pygame.draw.circle(screen, summoned_creature.color, circle_pos, circle_radius)
         pass
     if UI == "Overworld":
         screen.fill((WHITE))
