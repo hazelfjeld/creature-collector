@@ -12,7 +12,7 @@ BLACK=(0,0,0)
 
 # === Creatures ===
 summoned_creature = None
-
+creature_summoned = False
 class Creature:
     def __init__(self,attack,defense,health,rarity,color):
         self.attack=attack
@@ -47,7 +47,7 @@ def summon_creature():
 
 
 # UI config
-UI="Overworld" # We can edit this and make it something like "Start" for the start screen
+UI="Start" # We can edit this and make it something like "Start" for the start screen
 # === Player Vars ===
 player= pygame.Rect(275,275,25,25)
 speed=3
@@ -60,7 +60,15 @@ new_game_button=pygame.Rect(0,500,100,50)
 # === Oveworld Vars ===
 exit_button_text=font.render('exit', True, WHITE)
 exit_button = pygame.Rect(0,0,100,50)
-
+battle_button_text=font.render('Battle', True, WHITE)
+battle_button = pygame.Rect(200,0,100,50)
+# === Battle Vars ===
+run_text =font.render('Run', True, WHITE)
+run_button=pygame.Rect(400,500,100,50)
+choose_attack_text =font.render('Choose attack', True, WHITE)
+choose_attack_button = pygame.Rect(200,500,100,50)
+items_text =font.render('Items', True, WHITE)
+items_button=pygame.Rect(0,500,100,50)
 running=True
 while running:
     for events in pygame.event.get():
@@ -72,25 +80,33 @@ while running:
                 if load_button.collidepoint(events.pos):
                     UI = "Overworld"
                 if new_game_button.collidepoint(events.pos):
-                    summoned_creature = summon_creature()
+                    UI = "Overworld"
+                    
+                    
             
             pass
         if UI == "Overworld":
             if events.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(events.pos):
                     UI = "Start"
+                if battle_button.collidepoint(events.pos):
+                    UI = "Battle"
+                    creature_summoned = False
             pass
+        if UI == "Battle":
+            if events.type == pygame.MOUSEBUTTONDOWN:
+                if run_button.collidepoint(events.pos):
+                    UI = "Overworld"
     screen.fill((WHITE))
     
     if UI == "Start":
         screen.fill((WHITE))
-
+        # === Draw Everything ===
         pygame.draw.rect(screen, BLACK, load_button) # Exit button
         screen.blit(load_button_text, load_button)
         pygame.draw.rect(screen, BLACK, new_game_button) # Exit button
         screen.blit(new_game_text, new_game_button)
-        if summoned_creature:
-            pygame.draw.circle(screen, summoned_creature.color, circle_pos, circle_radius)
+        
         pass
     if UI == "Overworld":
         screen.fill((WHITE))
@@ -104,12 +120,31 @@ while running:
             player.y -= speed
         if keys[pygame.K_DOWN]: 
             player.y += speed
-
-        
         # === Draw Everything ===
         pygame.draw.rect(screen, BLACK, exit_button) # Exit button
         pygame.draw.rect(screen, BLACK, player) # Player
         screen.blit(exit_button_text, exit_button)
+        pygame.draw.rect(screen, BLACK, battle_button)
+        screen.blit(battle_button_text,battle_button)
+    if UI == "Battle":
+        screen.fill(WHITE)
+
+        if not creature_summoned:
+            summoned_creature = summon_creature()
+            creature_summoned = True
+
+        # === Draw Creature ===
+        if summoned_creature:
+            pygame.draw.circle(screen, summoned_creature.color, circle_pos, circle_radius)
+
+        # === Draw Buttons ===
+        pygame.draw.rect(screen, BLACK, run_button)
+        screen.blit(run_text, run_button)
+        pygame.draw.rect(screen, BLACK, choose_attack_button)
+        screen.blit(choose_attack_text, choose_attack_button)
+        pygame.draw.rect(screen, BLACK, items_button)
+        screen.blit(items_text, items_button)
+
     pygame.display.flip()
     clock.tick(60)
 
@@ -158,6 +193,12 @@ while running:
 # - Load from save file
 
 # === Assets Needed ===
+# - Creature sprites
+# - Battle backgrounds
+# - Tileset for maps
+# - UI icons/buttons
+# - Sound effects and music
+
 # - Creature sprites
 # - Battle backgrounds
 # - Tileset for maps
